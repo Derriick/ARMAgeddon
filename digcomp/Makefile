@@ -36,7 +36,7 @@ $(BIN): $(OBJS)
 
 
 clean:
-	@rm -vf *.cm[io] *~ .*~ parser.ml parser.mli lexer.ml lexer.mli
+	@rm -vf *.cm[io] *~ .*~ digcomp parser.ml parser.mli lexer.ml lexer.mli
 
 distclean: clean
 	@rm -fr doc $(BIN)

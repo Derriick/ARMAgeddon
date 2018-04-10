@@ -12,6 +12,8 @@ let _ =
       "addi", ADDI;
       "sub",  SUB;
       "subi", SUBI;
+      "cmpi", CMPI;
+      "cmp",  CMP;
       "ld",   LD;
       "st",   ST;
       "in",   IN;

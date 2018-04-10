@@ -30,14 +30,16 @@ type label = string
 type instr =
       Nop
     | Ldi   of (int * int)   (** rd, imm8 *)
-    | Add   of (int * int * int * bool) (** rd, rs, rt, sub? *)
-    | Addi  of (int * int * int * bool) (** rd, rs, imm5, sub? *)
-    | Load  of (int * int) (** rd, rs *)
-    | Store of (int * int) (** rs, rd *)
+    | Add   of (int * int * int * bool * int) (** rd, rs, rt, sub?, pred *)
+    | Addi  of (int * int * int * bool) (** rd, rs, uimm5, sub? *)
+    | Cmp   of (int * int * int) (** rs, rt, pred *)
+    | Cmpi  of (int * int) (** rd, uimm8 *)
+    | Load  of (int * int * int) (** rd, rs, pred *)
+    | Store of (int * int * int) (** rs, rd, pred *)
     | In    of int         (** rd *)
     | Out   of int         (** rs *)
     | CJmp  of (int * int * label * cond) (** rs, rt, addr, cond *)
-    | Jmp   of label (** label name *)
+    | Jmp   of label (** addr *)
     
 
 
@@ -48,16 +50,20 @@ type instr =
 let dump_instr = fun i -> match i with
 | Nop -> Printf.printf ".\n"
 | Ldi (r,v) -> Printf.printf "r%d <- %d\n" r v
-| Add (rd,rs,rt,b) ->
+| Add (rd,rs,rt,b,p) ->
         let c = if b then '-' else '+' in
-        Printf.printf "r%d <- r%d %c r%d\n" rd rs c rt
+        Printf.printf "r%d <- r%d %c r%d (%d)\n" rd rs c rt p
 | Addi (rd,rs,v,b) ->
         let c = if b then '-' else '+' in
         Printf.printf "r%d <- r%d %c %d\n" rd rs c v
-| Load (rd, rs) ->
-        Printf.printf "r%d <- MEM[r%d]\n" rd rs
-| Store (rs, rd) ->
-        Printf.printf "MEM[r%d] <- r%d\n" rs rd
+| Cmpi (rd, v) ->
+        Printf.printf "pred <- cmp(r%d,%d)\n" rd v
+| Cmp (rs, rt, p) ->
+        Printf.printf "pred <- cmp(r%d,r%d) (%d)\n" rs rt p
+| Load (rd, rs, p) ->
+        Printf.printf "r%d <- MEM[r%d] (%d)\n" rd rs p
+| Store (rs, rd, p) ->
+        Printf.printf "MEM[r%d] <- r%d (%d)\n" rs rd p
 | In rd ->
         Printf.printf "r%d <- getchar()\n" rd
 | Out rs ->
@@ -87,9 +93,9 @@ let imm_of_int = fun s v ->
 (* Type 1a: [xxx] [xx] [xxx]    [xxx] [xxx] 00
  *           cat  flags rd       rs    rt
  *)
-let instr_to_bin_type1 = fun c f1 f2 r1 r2 r3 ->
+let instr_to_bin_type1 = fun c f1 f2 r1 r2 r3 p ->
     let hi = (c lsl 5) + (f1 lsl 4) + (f2 lsl 3) + r1 in
-    let lo = (r2 lsl 5) + (r3 lsl 2) in
+    let lo = (r2 lsl 5) + (r3 lsl 2) + p in
     (Printf.sprintf "%02x" hi, Printf.sprintf "%02x" lo)
 
 (* Type 1b: [xxx] [xx] [xxx]    [xxx] [xxxxx]
@@ -137,16 +143,20 @@ let instr_to_bin = fun i caddr assoc ->
             instr_to_bin_type2 0b000 0 0 0 0
     | Ldi (r,v) ->
             instr_to_bin_type2 0b000 0 1 r v
-    | Add (rd,rs,rt,b) ->
+    | Add (rd,rs,rt,b,p) ->
             let f1 = if b then 1 else 0 in
-            instr_to_bin_type1 0b010 f1 1 rd rs rt
+            instr_to_bin_type1 0b010 f1 1 rd rs rt p
     | Addi (rd,rs,v,b) ->
             let f1 = if b then 1 else 0 in
             instr_to_bin_type1b 0b010 f1 0 rd rs v
-    | Load (rd,rs) ->
-            instr_to_bin_type1b 0b100 0 1 rd rs 0
-    | Store (rs,rd) ->
-            instr_to_bin_type1b 0b100 0 0 rd rs 0
+    | Cmpi (rd,v) ->
+            instr_to_bin_type2 0b011 1 0 rd v
+    | Cmp (rs,rt,p) ->
+            instr_to_bin_type1 0b011 1 1 0 rs rt p
+    | Load (rd,rs,p) ->
+            instr_to_bin_type1 0b100 0 1 rd rs 0 p
+    | Store (rs,rd,p) ->
+            instr_to_bin_type1 0b100 0 0 rd rs 0 p
     | In rd ->
             instr_to_bin_type2 0b100 1 1 rd 0
     | Out rs ->
