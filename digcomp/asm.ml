@@ -27,20 +27,19 @@ type label = string
       {- uimmX = immediate unsigned-integer value on X bits}
     }
  *)
-type instr =
-      Nop
-    | Ldi   of (int * int)   (** rd, imm8 *)
-    | Add   of (int * int * int * bool * int) (** rd, rs, rt, sub?, pred *)
-    | Addi  of (int * int * int * bool) (** rd, rs, uimm5, sub? *)
-    | Cmp   of (int * int * int) (** rs, rt, pred *)
-    | Cmpi  of (int * int) (** rd, uimm8 *)
-    | Load  of (int * int * int) (** rd, rs, pred *)
-    | Store of (int * int * int) (** rs, rd, pred *)
-    | In    of int         (** rd *)
-    | Out   of int         (** rs *)
-    | CJmp  of (int * int * label * cond) (** rs, rt, addr, cond *)
-    | Jmp   of label (** addr *)
-    
+ type instr =
+    Nop
+  | Ldi   of (int * int)                    (** rd, imm8 *)
+  | Add   of (int * int * int * bool * int) (** rd, rs, rt, sub?, pred *)
+  | Addi  of (int * int * int * bool)       (** rd, rs, uimm5, sub? *)
+  | Cmp   of (int * int * int)              (** rs, rt, pred *)
+  | Cmpi  of (int * int)                    (** rd, uimm8 *)
+  | Load  of (int * int * int)              (** rd, rs, pred *)
+  | Store of (int * int * int)              (** rs, rd, pred *)
+  | In    of int                            (** rd *)
+  | Out   of int                            (** rs *)
+  | CJmp  of (int * int * label * cond)     (** rs, rt, addr, cond *)
+  | Jmp   of label                          (** addr *)
 
 
 (**
