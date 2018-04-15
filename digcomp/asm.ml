@@ -56,9 +56,9 @@ let dump_instr = fun i -> match i with
         let c = if b then '-' else '+' in
         Printf.printf "r%d <- r%d %c %d\n" rd rs c v
 | Cmpi (rd, v) ->
-        Printf.printf "pred <- cmp(r%d,%d)\n" rd v
+        Printf.printf "flags <- cmp(r%d,%d)\n" rd v
 | Cmp (rs, rt, p) ->
-        Printf.printf "pred <- cmp(r%d,r%d) (%d)\n" rs rt p
+        Printf.printf "flags <- cmp(r%d,r%d) (%d)\n" rs rt p
 | Load (rd, rs, p) ->
         Printf.printf "r%d <- MEM[r%d] (%d)\n" rd rs p
 | Store (rs, rd, p) ->
