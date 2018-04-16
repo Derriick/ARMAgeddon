@@ -1,5 +1,5 @@
 # ARMAgeddon
-Projet d'architecture matériel - Instructions avec prédicat
+Projet d'architecture matérielle - Instructions avec prédicat
 
 ## Utilisation
 Les fichiers nécessaires pour tester le processeur sont:
