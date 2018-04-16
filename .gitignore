@@ -23,5 +23,14 @@ setup.log
 *.lfo
 
 # digcomp
-*.lo
 *.hi
+*.lo
+
+# latex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.pdf
+*.synctex.gz
+*.toc
