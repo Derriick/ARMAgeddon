@@ -53,14 +53,14 @@
 \maketitle
 
 \begin{abstract}
-L’objectif de ce projet était la réalisation d’un mini-processeur dans Diglog. Pour ce faire, nous devions nous appuyer sur le jeu d'instructions d'un processeur MIPS, que nous avons implémenté dans le logiciel Diglog\ldots\\
+L’objectif de ce projet était la réalisation d’un mini-processeur. Pour ce faire, nous devions nous appuyer sur le jeu d'instructions d'un processeur MIPS, que nous avons implémenté dans le logiciel Diglog\ldots\\
 \\
 Les instructions qui ont été implémentées sont:
 \begin{itemize}
         \item{\texttt{nop}}
         \item{\texttt{ldi}}
         \item{\texttt{nop}}
-        \item{\texttt{lsr}: une version simpléfiée qui ne décale que d'un bit}
+        \item{\texttt{lsr}: une version simplifiée qui ne décale le nombre en entrée que d'un bit}
         \item{\texttt{or} avec prédicat}
         \item{\texttt{and} avec prédicat}
         \item{\texttt{addi}}
@@ -84,13 +84,13 @@ Les instructions qui ont été implémentées sont:
 \newpage
 \section{ALU}
 \paragraph{}
-Cet ALU permet de faire de nombreuses opérations sur des entiers sur 8 bits, comme l'addition et la soustraction en signée et non signée, ainsi que le complément à 1, l'incrémentation, l'opposé et les ET et OU binaires.\\
+Cet ALU permet de faire de nombreuses opérations sur des entiers sur 8 bits, comme l'addition ou la soustraction d'entiers signés et non-signés, ainsi que le complément à 1, l'incrémentation, l'opposé ou encore les ET et OU binaires.\\
 \\
 \centerline{\includegraphics[width=.8\textwidth]{alu_8}}
 \captionof{figure}{ALU à 5 bits de contrôle et 4 bits de sortie}
 
 \paragraph{Bits de contrôle et de sortie}
-Il prend en entrée deux entiers codés sur 8 bits et est géré par 5 bits de contrôle: \texttt{zb}, \texttt{ma}, \texttt{mb}, \texttt{lg} et \texttt{mo}. Il propose en sortie le résultat de l'opération sur 8 bits, ainsi que 4 bits de sortie: \texttt{Zero}, \texttt{Sign}, \texttt{Carry} et \texttt{Overflow}.
+Cet ALU prend en entrée deux entiers codés sur 8 bits et est géré par cinq bits de contrôle: \texttt{zb}, \texttt{ma}, \texttt{mb}, \texttt{lg} et \texttt{mo}. Il propose en sortie le résultat de l'opération sur 8 bits, ainsi que quatre autres bits de sortie: \texttt{Zero}, \texttt{Sign}, \texttt{Carry} et \texttt{Overflow}.
 
 \subsection{Bits de contrôle}
 \paragraph{}
@@ -100,7 +100,7 @@ Ces bits de contrôle sont au nombre de cinq et permettent de réaliser différe
 \captionof{figure}{Calcul des bits de contrôle de l'ALU}
 \paragraph{}
 \subsubsection{\texttt{zb}}
-Ce bit de contrôle gère le bloc \texttt{and1\_8} situé sur les bits de \texttt{b}, et permet de mettre \texttt{b} à 0 ou non avant de passer par le bloc \texttt{xor1\_8}.
+Ce bit de contrôle gère le bloc \texttt{and1\_8} situé sur les bits de \texttt{b}, et permet de mettre \texttt{b} à 0 ou non avant de passer dans le bloc \texttt{xor1\_8}.
 
 \subsubsection{\texttt{ma}}
 Ce bit de contrôle gère le bloc \texttt{xor1\_8} situé sur les bits de \texttt{a}, et permet de donner son complément à 1 avant d'être utilisé par \texttt{add8} et \texttt{and\_16\_8}.
@@ -166,7 +166,7 @@ Voici le tableau répertoriant les valeurs des bits de contrôle pour chaque ins
 	\end{tabular}
 \end{center}
 \paragraph{}
-On peut ainsi obtenir le tableau de Carnot suivant:
+On peut ainsi obtenir le tableau de Karnaugh suivant:
 \begin{center}
 	\ttfamily
 	\large
@@ -197,7 +197,7 @@ On peut ainsi obtenir le tableau de Carnot suivant:
 
 \subsection{Bits de sortie}
 \paragraph{}
-Cest bits de sortie donnent des informations supplémentaires sur le déroulement de l'opération entre les entrées \texttt{a} et \texttt{b}.
+Cest bits de sortie donnent des informations supplémentaires sur l'opération entre les nombres \texttt{a} et \texttt{b}.
 	
 \subsubsection{\texttt{Zero}}
 Ce bit de sortie est à 1 lorsque le résultat de l'opération est nul. Dans le cas d'une soustraction, il indique donc une égalité.
@@ -206,11 +206,81 @@ Ce bit de sortie est à 1 lorsque le résultat de l'opération est nul. Dans le 
 Ce bit de sortie est identique au bit de poids le plus fort dans le résultat de l'opération, et indique son signe dans le cas d'un entier signé.
 
 \subsubsection{\texttt{Carry}}
-Ce bit de sortie est la retenue en sortie du bloc \texttt{add\_8}.
+Ce bit de sortie est la retenue en sortie du bloc \texttt{add\_8}. Il correspond à un dépassement de capacité en non-signé.
 
 \subsubsection{\texttt{Overflow}}
-Ce bit indique qu'il y a eu un Overflow.
+Ce bit correspond à un dépassement de capacité en signé.
 
+\section{Bits de contrôle globaux}
+\begin{center}
+	\ttfamily
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\hline
+		instr	& op & flags & write\_reg & arg2\_imm & src2\_is\_rd & res\_imm \\
+		\hline
+		nop		& 000 & 00 & 0 & X & X & X \\
+		ldi		& 000 & 01 & 1 & X & X & 1 \\
+				& 000 & 10 & 0 & X & X & X \\
+				& 000 & 11 & 0 & X & X & X \\
+		\hline
+		not		& 001 & 00 & 1 & X & X & 0 \\
+		lsr		& 001 & 01 & 1 & 1 & X & 0 \\
+		or		& 001 & 10 & 1 & 0 & 0 & 0 \\
+		and		& 001 & 11 & 1 & 0 & 0 & 0 \\
+		\hline
+		addi	& 010 & 00 & 1 & 1 & X & 0 \\
+		add		& 010 & 01 & 1 & 0 & 0 & 0 \\
+		subi	& 010 & 10 & 1 & 1 & X & 0 \\
+		sub		& 010 & 11 & 1 & 0 & 0 & 0 \\
+		\hline
+		muli	& 011 & 00 & 1 & 1 & X & 0 \\
+		mul		& 011 & 01 & 1 & 0 & 0 & 0 \\
+		compi	& 011 & 10 & 0 & 1 & X & X \\
+		comp	& 011 & 11 & 0 & 0 & 0 & X \\
+		\hline
+		st		& 100 & 00 & 0 & 1 & 1 & X \\
+		ld		& 100 & 01 & 1 & 1 & X & 0 \\
+		out		& 100 & 10 & 0 & X & 1 & X \\
+		in		& 100 & 11 & 1 & X & X & 0 \\
+		\hline
+		jr		& 101 & 00 & 0 & 1 & 1 & X \\
+				& 101 & 01 & 0 & X & X & X \\
+				& 101 & 10 & 0 & X & X & X \\
+				& 101 & 11 & 0 & X & X & X \\
+		\hline
+		jeq		& 110 & 00 & 0 & 1 & 1 & X \\
+		jle		& 110 & 01 & 0 & 1 & 1 & X \\
+		jlt		& 110 & 10 & 0 & 1 & 1 & X \\
+		jne		& 110 & 11 & 0 & 1 & 1 & X \\
+		\hline
+		jmp		& 111 & 00 & 0 & X & X & X \\
+		jmp		& 111 & 01 & 0 & X & X & X \\
+		jmp		& 111 & 10 & 0 & X & X & X \\
+		jmp		& 111 & 11 & 0 & X & X & X \\
+		\hline
+	\end{tabular}
+\end{center}
+
+\newpage
+\section{Autres bits de contrôle}
+\paragraph{}
+Ces bits de contrôle sont spécifiques à certaines instructions, et doivent seulement être mis à \texttt{1} dans ces cas là.
+
+\subsection{Instructions de saut}
+\centerline{\includegraphics[width=.8 \textwidth]{log_jmp}}
+\captionof{figure}{Calcul des bits de sauts absolus ou conditionnels}
+\centerline{\includegraphics[width=.8 \textwidth]{mgr_jmp}}
+\captionof{figure}{Gestion des sauts absolus ou conditionnels}
+
+\subsection{Instructions \texttt{in} et \texttt{out}}
+\centerline{\includegraphics[scale=.5]{log_in_out}}
+\captionof{figure}{Calcul des bits \texttt{in} et \texttt{out}}
+
+\subsection{Instruction \texttt{lsr}}
+\centerline{\includegraphics[scale=.6]{log_lsr}}
+\captionof{figure}{Calcul d bit \texttt{lsr}}
+
+\newpage
 \section{Modifications apportées au processeur}
 
 \subsection{Introduction du registre \texttt{flags}}
@@ -223,19 +293,38 @@ Pour enregistrer le résultat d'une comparaison (instructions \texttt{cmpi} et \
 \subsection{Gestion des prédicats}
 \paragraph{}
 Les instructions de type \texttt{1a} possèdent 2 bits actuellement inutilisés. Il est donc possible d'y attribuer des valeurs pour compléter ces instructions.\\
-Le but ici est d'autoriser leur réalisation durant l'exécution selon le résultat de la dernière comparaison entre deux valeurs.\\
+Le but ici est d'autoriser leur exécution en fonction de la dernière comparaison entre deux valeurs, dont le résultat est stocké dans le registre \texttt{flags}.\\
 \\
 \centerline{\includegraphics[width=.5 \textwidth]{log_pred}}
 \captionof{figure}{Calcul du bit \texttt{pred}}
 \paragraph{}
-La sortie \texttt{pred} permet de savoir si on doit prendre en compte les deux bits de poids plus faibles afin de savoir si l'instruction doit être réalisée. Dans le cas contraire, il ne s'agit tout simplement pas du prédicat d'une instruction \texttt{1a}.
+La sortie \texttt{pred} permet de savoir si les deux bits de poids plus faibles sont un prédicat, afin de savoir si l'instruction doit être réalisée ou non. Dans le cas contraire, il ne s'agit tout simplement pas d'une instruction de type \texttt{1a}.
+
+\subsection{Implémentation des instructions \texttt{cmpi} et \texttt{cmp}}
+\paragraph{Spécificité de \texttt{cmpi}}
+L'instruction \texttt{cmpi} est la seule à être de type \texttt{2} tout en nécessitant une lecture du registre \texttt{\#rd}. C'est pourquoi un multiplexeur a été ajouté afin de lire le registre \texttt{\#rd} plutôt que \texttt{\#rs}, et de pouvoir le comparer avec \texttt{IMM8} via l'ALU.\\
+Il suffit alors d'avoir deux bits \texttt{cmp} et \texttt{cmpi} pour gérer chaque cas (le bit \texttt{cmpi} étant inclu dans \texttt{cmp}).\\
+\\
+\centerline{\includegraphics[width=.5 \textwidth]{log_cmp}}
+\captionof{figure}{Calcul des bits \texttt{cmp} et \texttt{cmpi}}
 
 \subsection{Comparaison et calcul du bit \texttt{op}}
 \paragraph{}
-À partir de la dernière comparaison dont le résultat est enregistré dans le registre \texttt{flags}, et le prédicat de l'instruction, on calcule le bit \texttt{op}, qui autorise ou non l'écrite dans le banc de registre ou la mémoire. L'écran n'est pas concerné, l'instruction correspondant est de type \texttt{2}.\\
+À partir de la dernière comparaison dont le résultat est enregistré dans le registre \texttt{flags}, et le prédicat de l'instruction, on calcule le bit \texttt{op}, qui autorise ou non l'écriture dans le banc de registre ou la mémoire. L'écran n'est pas concerné, l'instruction correspondant étant de type \texttt{2}.\\
 \\
 \centerline{\includegraphics[width=.8 \textwidth]{mgr_cmp}}
 \captionof{figure}{Comparaison et calcul du bit \texttt{op}}
+
+\subsection{Utilisation du bit \texttt{op}}
+\paragraph{}
+Le bit \texttt{op} vient en complément des bits de contrôle \texttt{write\_reg} et \texttt{write\_mem}; il est indispensable pour pouvoir écrire dans le banc de registre ou dans la mémoire. Cela permet d'ignorer les instructions dont le prédicat ne correspond pas au dernier résultat des instructions \texttt{cmpi} et \texttt{cmp}.\\
+\\
+\centerline{\includegraphics[width=.8 \textwidth]{proc}}
+\captionof{figure}{Utilisation du bit \texttt{op} sur le banc de registres}
+.\\
+\\
+\centerline{\includegraphics[scale=.5]{mgr_ram}}
+\captionof{figure}{Utilisation du bit \texttt{op} sur la RAM}
 
 \section{Modifications apportées au compilateur}
 
@@ -312,7 +401,7 @@ On ajoute les cas correspondant aux instructions \texttt{cmpi} et \texttt{cmp}. 
 
 \subsubsection{$parser.mly$}
 \paragraph{\texttt{code}}
-Pour chaque ligne traîtant une instruction de type \texttt{1a}, on la modifie pour que la fonction qu'elle appelle prenne un paramètre de type \texttt{int} en plus, qu'on initialise à 0. De plus, Pour chacune de ces lignes, on en crée une nouvelle qui nous permettra d'indique un prédicat pouvant aller de 0 à 3 (entier), et qui permettra au compilateur de l'ajouter dans les instructions concernées.
+Pour chaque ligne traîtant une instruction de type \texttt{1a}, on la modifie pour que la fonction qu'elle appelle prenne un paramètre supplémentaire de type \texttt{int}, qu'on initialise à 0. De plus, pour chacune de ces lignes, on en crée une nouvelle qui nous permettra d'indiquer un prédicat pouvant aller de 0 à 3 (entier), et qui sera ajouté par le compilateur dans les instructions concernées.
 \begin{lstlisting}
 	code:
 +		| ADD REG COMA REG COMA REG COMA INT
@@ -386,13 +475,13 @@ Les instructions gérées par la fonction prennent maintenant en compte les pré
 \subsection{Vérification du fonctionnement des prédicats}
 \lstinputlisting{../asm/1.asm}
 
-\subsection{Vérification de l'instruction \texttt{cmp}}
+\subsection{Vérification de la gestion des prédicats}
 \lstinputlisting{../asm/2.asm}
 
 \subsection{Vérification des instructions \texttt{in} et \texttt{out}}
 \lstinputlisting{../asm/3.asm}
 
-\subsection{Vérification des instructions de saut conditionnel}
+\subsection{Vérification des instructions de sauts conditionnels}
 \lstinputlisting{../asm/4.asm}
 
 \end{document}
