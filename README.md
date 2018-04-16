@@ -5,8 +5,8 @@ Projet d'architecture matériel - Instructions avec prédicat
 Les fichiers nécessaires pour tester le processeur sont:
 - `digproc/combi.lgf`
 - `digproc/alu.lgf`
-- `register.lgf`
-- `proc.lgf`
+- `digproc/register.lgf`
+- `digproc/proc.lgf`
 
 Les fichiers sources du compilateur se trouvent dans le dossier `digcomp/`.
 
