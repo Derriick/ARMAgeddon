@@ -98,33 +98,7 @@ Ces bits de contrôle sont au nombre de cinq et permettent de réaliser différe
 \\
 \centerline{\includegraphics[width=.8 \textwidth]{log_alu}}
 \captionof{figure}{Calcul des bits de contrôle de l'ALU}
-\begin{table}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|c|}
-		\hline
-		& DE & 00 & 01 & 11 & 10 \\
-		\hline
-		ABC && xxxxx & xxxxx & xxxxx & xxxxx \\
-		\hline 
-		000 &&  &  &  &  \\
-		\hline 
-		001 &&  &  &  &  \\
-		\hline 
-		011 &&  &  &  &  \\
-		\hline 
-		010 &&  &  &  &  \\
-		\hline 
-		110 &&  &  &  &  \\
-		\hline 
-		111 &&  &  &  &  \\
-		\hline 
-		101 &&  &  &  &  \\
-		\hline 
-		100 &&  &  &  &  \\
-		\hline
-	\end{tabular} 
-\end{table}
-
+\paragraph{}
 \subsubsection{\texttt{zb}}
 Ce bit de contrôle gère le bloc \texttt{and1\_8} situé sur les bits de \texttt{b}, et permet de mettre \texttt{b} à 0 ou non avant de passer par le bloc \texttt{xor1\_8}.
 
@@ -138,12 +112,93 @@ Ce bit de contrôle gère le bloc \texttt{xor1\_8} situé sur les bits de \textt
 Ce bit de contrôle gère le multiplexeur \texttt{mux\_16\_8} permettant de retourner le résultat de \texttt{add8} ou celui de \texttt{and\_16\_8}.
 
 \subsubsection{\texttt{mo}}
-Ce bit de contrôle gère le bloc \texttt{xor1\_8} situé après le multiplexeur \texttt{mux\_16\_8}, et permet retourner le résultat de \texttt{add8} et \texttt{and\_16\_8} ou son complément à 1.
+Ce bit de contrôle gère le bloc \texttt{xor1\_8} situé après le multiplexeur \texttt{mux\_16\_8}, et permet retourner le résultat de \texttt{add8} et \texttt{and\_16\_8} ou son complément à 1.\\
+\\
+Voici le tableau répertoriant les valeurs des bits de contrôle pour chaque instruction:
+\begin{center}
+	\ttfamily
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\hline
+		instr	& op & flags & zb & ma & mb & lg & mo \\
+		\hline
+				& abc & de &&&&& \\
+		\hline
+		nop		& 000 & 00 & X & X & X & X & X \\
+		ldi		& 000 & 01 & X & X & X & X & X \\
+				& 000 & 10 & X & X & X & X & X \\
+				& 000 & 11 & X & X & X & X & X \\
+		\hline
+		not		& 001 & 00 & 1 & 1 & X & X & 0 \\
+		lsr		& 001 & 01 & 0 & 0 & 0 & 0 & 0 \\
+		or		& 001 & 10 & 0 & 1 & 1 & 1 & 1 \\
+		and		& 001 & 11 & 0 & 0 & 0 & 1 & 0 \\
+		\hline
+		addi	& 010 & 00 & 0 & 0 & 0 & 0 & 0 \\
+		add		& 010 & 01 & 0 & 0 & 0 & 0 & 0 \\
+		subi	& 010 & 10 & 0 & 1 & 0 & 0 & 1 \\
+		sub		& 010 & 11 & 0 & 1 & 0 & 0 & 1 \\
+		\hline
+		muli	& 011 & 00 & X & X & X & X & X \\
+		mul		& 011 & 01 & X & X & X & X & X \\
+		compi	& 011 & 10 & 0 & 1 & 0 & 0 & 1 \\
+		comp	& 011 & 11 & 0 & 1 & 0 & 0 & 1 \\
+		\hline
+		st		& 100 & 00 & 0 & 0 & 0 & 0 & 0 \\
+		ld		& 100 & 01 & 0 & 0 & 0 & 0 & 0 \\
+		out		& 100 & 10 & X & X & X & X & X \\
+		in		& 100 & 11 & X & X & X & X & X \\
+		\hline
+		jr		& 101 & 00 & X & X & X & X & X \\
+				& 101 & 01 & X & X & X & X & X \\
+				& 101 & 10 & X & X & X & X & X \\
+				& 101 & 11 & X & X & X & X & X \\
+		\hline
+		jeq		& 110 & 00 & 0 & 1 & 0 & 0 & 1 \\
+		jle		& 110 & 01 & 0 & 1 & 0 & 0 & 1 \\
+		jlt		& 110 & 10 & 0 & 1 & 0 & 0 & 1 \\
+		jne		& 110 & 11 & 0 & 1 & 0 & 0 & 1 \\
+		\hline
+		jmp		& 111 & 00 & X & X & X & X & X \\
+		jmp		& 111 & 01 & X & X & X & X & X \\
+		jmp		& 111 & 10 & X & X & X & X & X \\
+		jmp		& 111 & 11 & X & X & X & X & X \\
+		\hline
+	\end{tabular}
+\end{center}
+\paragraph{}
+On peut ainsi obtenir le tableau de Carnot suivant:
+\begin{center}
+	\ttfamily
+	\large
+	\begin{tabular}{|c|c|c|c|c|c|}
+		\hline
+		& de & 00 & 01 & 11 & 10 \\
+		\hline
+		abc &&&&& \\
+		\hline 
+		000 && X X X X X & X X X X X & X X X X X & X X X X X \\
+		\hline 
+		001 && 1 1 X X 0 & 0 0 0 0 0 & 0 0 0 1 0 & 0 1 1 1 1 \\
+		\hline 
+		011 && X X X X X & X X X X X & 0 1 0 0 1 & 0 1 0 0 1 \\
+		\hline 
+		010 && 0 0 0 0 0 & 0 0 0 0 0 & 0 1 0 0 1 & 0 1 0 0 1\\
+		\hline 
+		110 && 0 1 0 0 1 & 0 1 0 0 1 & 0 1 0 0 1 & 0 1 0 0 1 \\
+		\hline 
+		111 && X X X X X & X X X X X & X X X X X & X X X X X \\
+		\hline 
+		101 && X X X X X & X X X X X & X X X X X & X X X X X \\
+		\hline 
+		100 && 0 0 0 0 0 & 0 0 0 0 0 & 0 0 0 0 0 & 0 0 0 0 0 \\
+		\hline
+	\end{tabular}
+\end{center}
 
 \subsection{Bits de sortie}
 \paragraph{}
 Cest bits de sortie donnent des informations supplémentaires sur le déroulement de l'opération entre les entrées \texttt{a} et \texttt{b}.
-
+	
 \subsubsection{\texttt{Zero}}
 Ce bit de sortie est à 1 lorsque le résultat de l'opération est nul. Dans le cas d'une soustraction, il indique donc une égalité.
 
@@ -333,5 +388,11 @@ Les instructions gérées par la fonction prennent maintenant en compte les pré
 
 \subsection{Vérification de l'instruction \texttt{cmp}}
 \lstinputlisting{../asm/2.asm}
+
+\subsection{Vérification des instructions \texttt{in} et \texttt{out}}
+\lstinputlisting{../asm/3.asm}
+
+\subsection{Vérification des instructions de saut conditionnel}
+\lstinputlisting{../asm/4.asm}
 
 \end{document}
