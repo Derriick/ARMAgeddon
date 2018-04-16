@@ -32,8 +32,8 @@ type label = string
   | Ldi   of (int * int)                    (** rd, imm8 *)
   | Add   of (int * int * int * bool * int) (** rd, rs, rt, sub?, pred *)
   | Addi  of (int * int * int * bool)       (** rd, rs, uimm5, sub? *)
-  | Cmp   of (int * int * int)              (** rs, rt, pred *)
   | Cmpi  of (int * int)                    (** rd, uimm8 *)
+  | Cmp   of (int * int * int)              (** rs, rt, pred *)
   | Load  of (int * int * int)              (** rd, rs, pred *)
   | Store of (int * int * int)              (** rs, rd, pred *)
   | In    of int                            (** rd *)
@@ -179,4 +179,3 @@ let instr_to_bin = fun i caddr assoc ->
     | Jmp lbl ->
             let addr = List.assoc lbl assoc in
             instr_to_bin_type3 0b111 addr
-
